@@ -1,0 +1,1 @@
+node D:\ViguBin\all.js %*
