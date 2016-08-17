@@ -9,9 +9,19 @@ var querystring = require('querystring');
 
 var keys = {
 	farNavigation: 'far',
-	farNavigationClientSources: 'cs',
+   explorerNavigation: 'exp',
+	navigationClientSources: 'cs',
+   navigationLoginComponent: 'lc',
+   navigationJSInfrastructure: 'in',
+   navigationHelpDesk: 'hd',
+   navigationPrinterStatus: 'ps',
+   navigationRightFax: 'rf',
 	visualStudio: 'vs',
 	visualStudioClientSources: 'cs',
+   visualStudioLoginComponent: 'lc',
+   visualStudioJSInfrastructure: 'in',
+   visualStudioHelpDesk: 'hd',
+   visualStudioPrinterStatus: 'ps',
 	visualStudioRightFax: 'rf',
 	envs: 'envs',
 	envsSecMgm: 'sec',
@@ -26,6 +36,14 @@ var pathes = {
 pathes['clientBinPath'] = path.resolve(pathes['sandbox'], 'nd_d\\bin\\csf');
 pathes['clientSourcesPath'] = path.resolve(pathes['sandbox'], 'nd_src\\csf');
 pathes['clientSourcesSolution'] = path.resolve(pathes['clientSourcesPath'], 'CSFMain.sln');
+pathes['loginComponentPath'] = path.resolve(pathes['clientSourcesPath'], 'runtime\\server\\sws\\websws\\client-web');
+pathes['loginComponentSolution'] = path.resolve(pathes['loginComponentPath'], 'login.sln');
+pathes['JSInfrastructurePath'] = path.resolve(pathes['clientSourcesPath'], 'runtime\\server\\infrastructure\\client-web');
+pathes['JSInfrastructureSolution'] = path.resolve(pathes['JSInfrastructurePath'], 'infrastructure.sln');
+pathes['helpDeskPath'] = path.resolve(pathes['clientSourcesPath'], 'runtime\\server\\helpdesk\\client-web');
+pathes['helpDeskSolution'] = path.resolve(pathes['helpDeskPath'], 'helpdesk.sln');
+pathes['printerStatusPath'] = path.resolve(pathes['clientSourcesPath'], 'runtime\\server\\printing\\client-web');
+pathes['printerStatusSolution'] = path.resolve(pathes['printerStatusPath'], 'printing.sln');
 pathes['rightFaxPath'] = path.resolve(pathes['clientSourcesPath'], 'runtime\\server\\fax\\rightfax');
 pathes['rightFaxSolution'] = path.resolve(pathes['rightFaxPath'], 'RightFax.sln');
 
@@ -78,16 +96,25 @@ function askQuestion(question, callback){
 	});
 }
 
-function navigation(params){	
-	var farMap = {}
-	farMap[keys.farNavigationClientSources] = function() { return [pathes.clientSourcesPath]; }		
-	executeAndForget(combineExecutionArgs([pathes.farPath], farMap, params[0], params.slice(1)));
+function navigation(navigator, params){	
+	var navigationMap = {}
+	navigationMap[keys.navigationClientSources] = function() { return [pathes.clientSourcesPath]; }	
+   navigationMap[keys.navigationLoginComponent] = function() { return [pathes.loginComponentPath]; }
+   navigationMap[keys.navigationJSInfrastructure] = function() { return [pathes.JSInfrastructurePath]; }	
+   navigationMap[keys.navigationHelpDesk] = function() { return [pathes.helpDeskPath]; }	
+   navigationMap[keys.navigationPrinterStatus] = function() { return [pathes.printerStatusPath]; }	
+   navigationMap[keys.navigationRightFax] = function() { return [pathes.rightFaxPath]; }	
+	executeAndForget(combineExecutionArgs([navigator], navigationMap, params[0], params.slice(1)));
 }
 
 function runVisualStudio(params){
 	var solutionsMap = {};
 	solutionsMap[keys.visualStudioClientSources] = function() { return [pathes.clientSourcesSolution]; }
-	solutionsMap[keys.visualStudioRightFax] = function() { return [pathes.rightFaxSolution]; }
+   solutionsMap[keys.visualStudioLoginComponent] = function() { return [pathes.loginComponentSolution]; }
+   solutionsMap[keys.visualStudioJSInfrastructure] = function() { return [pathes.JSInfrastructureSolution]; }
+	solutionsMap[keys.visualStudioHelpDesk] = function() { return [pathes.helpDeskSolution]; }
+   solutionsMap[keys.visualStudioPrinterStatus] = function() { return [pathes.printerStatusSolution]; }
+   solutionsMap[keys.visualStudioRightFax] = function() { return [pathes.rightFaxSolution]; }
 	executeAndForget(combineExecutionArgs(null, solutionsMap, params[0], params.slice(1)));
 }
 
@@ -209,7 +236,10 @@ function checkEnvs(params){
 var params = process.argv.slice(2);
 switch(params[0]){
 	case keys.farNavigation:
-		navigation(params.slice(1));
+		navigation(pathes.farPath, params.slice(1));
+	break;
+   case keys.explorerNavigation:
+		navigation('explorer', params.slice(1));
 	break;
 	case keys.visualStudio:
 		runVisualStudio(params.slice(1));
