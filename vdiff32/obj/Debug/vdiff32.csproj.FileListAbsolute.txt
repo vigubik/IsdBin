@@ -1,6 +1,0 @@
-D:\ViguBin\vdiff32\bin\Debug\vdiff32.exe.config
-D:\ViguBin\vdiff32\bin\Debug\vdiff32.exe
-D:\ViguBin\vdiff32\bin\Debug\vdiff32.pdb
-D:\ViguBin\vdiff32\obj\Debug\vdiff32.csprojResolveAssemblyReference.cache
-D:\ViguBin\vdiff32\obj\Debug\vdiff32.exe
-D:\ViguBin\vdiff32\obj\Debug\vdiff32.pdb

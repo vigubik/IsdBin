@@ -1,6 +1,0 @@
-D:\ViguBin\CodeReviewLauncher\bin\Debug\CodeReviewLauncher.exe.config
-D:\ViguBin\CodeReviewLauncher\bin\Debug\CodeReviewLauncher.exe
-D:\ViguBin\CodeReviewLauncher\bin\Debug\CodeReviewLauncher.pdb
-D:\ViguBin\CodeReviewLauncher\obj\Debug\CodeReviewLauncher.csprojResolveAssemblyReference.cache
-D:\ViguBin\CodeReviewLauncher\obj\Debug\CodeReviewLauncher.exe
-D:\ViguBin\CodeReviewLauncher\obj\Debug\CodeReviewLauncher.pdb
