@@ -1,0 +1,15 @@
+{
+  "name": "all",
+  "version": "1.0.0",
+  "description": "script for all",
+  "main": "all.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha . --reporter spec"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.0.2"
+  }
+}
