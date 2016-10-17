@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace CodeReviewLauncher
@@ -13,7 +14,7 @@ namespace CodeReviewLauncher
       static void Main(string[] args)
       {
          var task = Clipboard.GetText();
-         var psi = new ProcessStartInfo { WorkingDirectory = codeReviewPath, FileName = codeReview, Arguments = task };
+         var psi = new ProcessStartInfo { WorkingDirectory = codeReviewPath, FileName = codeReview, Arguments = task, UseShellExecute = true };
          Process.Start(psi);
       }
    }

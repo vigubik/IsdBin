@@ -137,8 +137,6 @@ function launchSUApp(env, appName) {
     }).on('error', function (e) {
         console.log(e.message);
     });
-	
-	//askQuestion('');
 }
 
 function pushBaseUrlToBin(env) {
@@ -149,14 +147,18 @@ function pushBaseUrlToBin(env) {
         }
         fs.readFile(file, 'utf8', function (err, data) {
             if (err) {
-                return console.log(err);
+                console.log(err);
+                return;
             }
             var result = data.replace(/(BaseUrl=")(.+?)(")/, '$1' + env.baseUrl + '$3');
             result = result.replace(/(EnvironnmentName=")(.+?)(")/, '$1' + env.enviroName + '$3');
             result = result.replace(/(Client=")(.+?)(")/, '$1' + env.suClient + '$3');
             result = result.replace(/(SuUrl=")(.+?)(")/, '$1' + env.suUrl + '$3');
-            fs.writeFile(file, result, 'utf8', function (err) {
-                if (err) return console.log(err);
+            fs.writeFile(file, result, 'utf8', function (error) {
+                if (error) {
+                    console.log(err);
+                    return;
+                }
                 console.log('updated: ' + file);
             });
         });
@@ -170,7 +172,7 @@ function envAction(evn, params) {
     var actionsMap = {};
     actionsMap[keys.envsSecMgm] = function () { launchSUApp(evn, suApps.secmgm); }
     actionsMap[keys.envsTestInst] = function () { launchSUApp(evn, suApps.testInstall); }
-    actionsMap[keys.envsPushUrl] = function (params) { pushBaseUrlToBin(evn); }
+    actionsMap[keys.envsPushUrl] = function () { pushBaseUrlToBin(evn); }
     
     actionsMap[params[0]] && actionsMap[params[0]](params);
 }
@@ -183,16 +185,16 @@ function confirmEnv(envName, params) {
                 params = answer.slice(1);
             }
             confirmEnv(answer[0], params);
-        })
+        });
         return;
     }
     
     if (params && params.length) {
-        envAction(envs[envName], params)
+        envAction(envs[envName], params);
     } else {
         askQuestion('select ' + envName + ' action:\n', function (answer) {
-            envAction(envs[envName], answer)
-        })
+            envAction(envs[envName], answer);
+        });
     }
 }
 
@@ -225,7 +227,7 @@ function checkEnvs(params) {
         confirmEnv(params[0], params.slice(1));
     } else {
         for (var envName in envs) {
-            checkEnv(envName, envs[envName])
+            checkEnv(envName, envs[envName]);
         }
         askQuestion('', function (answer) {
             confirmEnv(answer[0], answer.slice(1));
@@ -248,3 +250,5 @@ switch (params[0]) {
         checkEnvs(params.slice(1));
         break;
 }
+
+exports.combineExecutionArgs = combineExecutionArgs;

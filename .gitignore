@@ -5,3 +5,5 @@
 obj/*
 bin/*
 *.dat
+*.user
+/node_modules/*
