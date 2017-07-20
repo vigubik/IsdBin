@@ -6,6 +6,7 @@ var http = require('http');
 var readline = require('readline');
 var purl = require('url');
 var querystring = require('querystring');
+//var open = require('open');
 
 var keys = {
     farNavigation: 'far',
@@ -16,6 +17,8 @@ var keys = {
     navigationHelpDesk: 'hd',
     navigationPrinterStatus: 'ps',
     navigationRightFax: 'rf',
+    navigationDashBoardBranch: 'db',
+    navigationDashBoardTrunk: 'dbt',
     visualStudio: 'vs',
     visualStudioClientSources: 'cs',
     visualStudioLoginComponent: 'lc',
@@ -23,15 +26,21 @@ var keys = {
     visualStudioHelpDesk: 'hd',
     visualStudioPrinterStatus: 'ps',
     visualStudioRightFax: 'rf',
+    visualStudioDashBoard: 'db',
     envs: 'envs',
     envsSecMgm: 'sec',
     envsTestInst: 'tst',
-    envsPushUrl: 'pu'
+    envsPushUrl: 'pu',
+    version: 'ver',
+    disableProxy: 'proxy'
 }
 
 var pathes = {
     farPath: 'C:\\Program Files (x86)\\Far2\\Far.exe',
     sandbox: 'D:\\Projects\\CSF\\CSFClientSources',
+    dashboardTrunkSandbox: 'D:\\Projects\\CSF\\Dashboard_branch\\Trunk',
+    dashboardBranchSandbox: 'D:\Projects\\CSF\\Dashboard_branch\\4_1_X_LAB5',
+    csfRepository: 'http://svn.isd.dp.ua/csf/trunk'
 };
 pathes['clientBinPath'] = path.resolve(pathes['sandbox'], 'nd_d\\bin\\csf');
 pathes['clientSourcesPath'] = path.resolve(pathes['sandbox'], 'nd_src\\csf');
@@ -46,12 +55,17 @@ pathes['printerStatusPath'] = path.resolve(pathes['clientSourcesPath'], 'runtime
 pathes['printerStatusSolution'] = path.resolve(pathes['printerStatusPath'], 'printing.sln');
 pathes['rightFaxPath'] = path.resolve(pathes['clientSourcesPath'], 'runtime\\server\\fax\\rightfax');
 pathes['rightFaxSolution'] = path.resolve(pathes['rightFaxPath'], 'RightFax.sln');
+pathes['dashBoardBranchPath'] = path.resolve(pathes['dashboardBranchSandbox'], 'apps\\glab\\src\\ws\\wsjava\\web');
+pathes['dashBoardBranchSolution'] = path.resolve(pathes['dashBoardBranchPath'], 'weblab.sln');
+pathes['dashBoardTrunkPath'] = path.resolve(pathes['dashboardTrunkSandbox'], 'nd_src\\gene\\apps\\glab\\src\\ws\\wsjava\\web');
 
 var envs = {
     zd50: { enviroName: 'zd50', baseUrl: 'http://zd.isd.dp.ua:27679', suUrl: 'http://scclis:8080/SUplus-web', suClient: 'csfqc' },
     mt36: { enviroName: 'mt36', baseUrl: 'http://mt.isd.dp.ua:26170', suUrl: 'http://scclis:8080/SUplus-web', suClient: 'csfqc' },
     mt13: { enviroName: 'mt13', baseUrl: 'http://mt.isd.dp.ua:26268', suUrl: 'http://scclis:8080/SUplus-web', suClient: 'csfqc' },
     zd42: { enviroName: 'zd42', baseUrl: 'http://zd.isd.dp.ua:26379', suUrl: 'http://scclis:8080/SUplus-web', suClient: 'csf' },
+    local: { enviroName: 'local', baseUrl: 'http://ivguba:8080', suUrl: 'http://scclis:8080/SUplus-web', suClient: 'csfqc' },
+    mush: { enviroName: 'mush', baseUrl: 'http://pc-mush:7001', suUrl: 'http://scclis:8080/SUplus-web', suClient: 'csfqc' },
 }
 
 var suApps = {
@@ -104,6 +118,8 @@ function navigation(navigator, params) {
     navigationMap[keys.navigationHelpDesk] = function () { return [pathes.helpDeskPath]; }
     navigationMap[keys.navigationPrinterStatus] = function () { return [pathes.printerStatusPath]; }
     navigationMap[keys.navigationRightFax] = function () { return [pathes.rightFaxPath]; }
+    navigationMap[keys.navigationDashBoardBranch] = function () { return [pathes.dashBoardBranchPath]; }
+    navigationMap[keys.navigationDashBoardTrunk] = function () { return [pathes.dashBoardTrunkPath]; }
     executeAndForget(combineExecutionArgs([navigator], navigationMap, params[0], params.slice(1)));
 }
 
@@ -115,6 +131,7 @@ function runVisualStudio(params) {
     solutionsMap[keys.visualStudioHelpDesk] = function () { return [pathes.helpDeskSolution]; }
     solutionsMap[keys.visualStudioPrinterStatus] = function () { return [pathes.printerStatusSolution]; }
     solutionsMap[keys.visualStudioRightFax] = function () { return [pathes.rightFaxSolution]; }
+    solutionsMap[keys.visualStudioDashBoard] = function () { return [pathes.dashBoardBranchSolution]; }
     executeAndForget(combineExecutionArgs(null, solutionsMap, params[0], params.slice(1)));
 }
 
@@ -235,6 +252,60 @@ function checkEnvs(params) {
     }
 }
 
+function printVersion(revision) {
+    childProcess.exec('svn log http://svn.isd.dp.ua/csf/tags/csf/1.0.1 -r ' + revision + ':HEAD --stop-on-copy -l 1 -v', function (error, stdout, stderr) {
+        if (error || stderr) {
+            console.log(error || stderr);
+            askQuestion('');
+        } else {
+            console.log(stdout);
+            var version = stdout.match(/\/tags\/csf\/1.0.1\/(\d+.\d+.\d+.\d+)/)[1];
+            var url = 'http://se/cm/index.php?script=install%2Findex.php^&ProductList=340^&search=' + version + '^&ShowSVN=on^&selectSVN=0^&Office%5B%5D=SCC';
+            executeAndForget(['start', url]);
+        }
+    });
+      
+    //askQuestion('');
+}
+
+var disableProxyFileVisitors = [
+    {
+        filePatternRegEx: new RegExp('\.exe\.config$'),
+        modifyContent: function (originalContent) {
+            return originalContent.replace(/<proxy autoDetect="false"\/>/, '');
+        }
+    }
+];
+
+function applyVisitorOnFile(visitor, filePath) {
+    var content = fs.readFileSync(filePath, { encoding: 'utf8' });
+    var newContent = visitor.modifyContent(content);
+    if (newContent != content) {
+        fs.writeFileSync(filePath, newContent, { encoding: 'utf8' });
+        console.log(filePath + ' updated');
+    }
+}
+
+function modifyFilesRecursive(folder, visitors) {
+    fs.readdirSync(folder).forEach(function (fileName) {
+        var filePath = path.resolve(folder, fileName);
+        if (fs.lstatSync(filePath).isDirectory()) {
+            modifyFilesRecursive(filePath, visitors);
+        } else {
+            visitors.forEach(function (visitor) {
+                if (visitor.filePatternRegEx.test(filePath)) {
+                    applyVisitorOnFile(visitor, filePath);
+                }
+            });
+        }
+    });
+    return 0;
+};
+
+function disableProxy() {
+   modifyFilesRecursive(pathes['clientBinPath'], disableProxyFileVisitors);
+}
+
 var params = process.argv.slice(2);
 switch (params[0]) {
     case keys.farNavigation:
@@ -248,6 +319,11 @@ switch (params[0]) {
         break;
     case keys.envs:
         checkEnvs(params.slice(1));
+        break;
+    case keys.version:
+        printVersion(params.slice(1));
+    case keys.disableProxy:
+        disableProxy(params.slice(1));
         break;
 }
 
