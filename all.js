@@ -37,10 +37,11 @@ var keys = {
 
 var pathes = {
     farPath: 'C:\\Program Files (x86)\\Far2\\Far.exe',
-    sandbox: 'D:\\Projects\\CSF\\CSFClientSources',
+    sandbox: 'C:\\Projects\\CSFClientSources',
     dashboardTrunkSandbox: 'D:\\Projects\\CSF\\Dashboard_branch\\Trunk',
-    dashboardBranchSandbox: 'D:\Projects\\CSF\\Dashboard_branch\\4_1_X_LAB5',
-    csfRepository: 'http://svn.isd.dp.ua/csf/trunk'
+    dashboardBranchSandbox: 'D:\\Projects\\CSF\\Dashboard_branch\\4_1_X_LAB5',
+    csfRepository: 'http://svn.isd.dp.ua/csf/trunk',
+    envsBinPath: 'C:\\SCC\\Pre-deployed\\PRIMARY_0\\csfqc'
 };
 pathes['clientBinPath'] = path.resolve(pathes['sandbox'], 'nd_d\\bin\\csf');
 pathes['clientSourcesPath'] = path.resolve(pathes['sandbox'], 'nd_src\\csf');
@@ -61,10 +62,11 @@ pathes['dashBoardTrunkPath'] = path.resolve(pathes['dashboardTrunkSandbox'], 'nd
 
 var envs = {
     zd50: { enviroName: 'zd50', baseUrl: 'http://zd.isd.dp.ua:27679', suUrl: 'http://scclis:8080/SUplus-web', suClient: 'csfqc' },
+    xd22: { enviroName: 'xd22', baseUrl: 'http://xd.isd.dp.ua:7703', suUrl: 'http://scclis:8080/SUplus-web', suClient: 'csf' },
     mt36: { enviroName: 'mt36', baseUrl: 'http://mt.isd.dp.ua:26170', suUrl: 'http://scclis:8080/SUplus-web', suClient: 'csfqc' },
     mt13: { enviroName: 'mt13', baseUrl: 'http://mt.isd.dp.ua:26268', suUrl: 'http://scclis:8080/SUplus-web', suClient: 'csfqc' },
     zd42: { enviroName: 'zd42', baseUrl: 'http://zd.isd.dp.ua:26379', suUrl: 'http://scclis:8080/SUplus-web', suClient: 'csf' },
-    local: { enviroName: 'local', baseUrl: 'http://ivguba:8080', suUrl: 'http://scclis:8080/SUplus-web', suClient: 'csfqc' },
+    local: { enviroName: 'local', baseUrl: 'http://pc-vigu:8080', suUrl: 'http://scclis:8080/SUplus-web', suClient: 'csfqc' },
     mush: { enviroName: 'mush', baseUrl: 'http://pc-mush:7001', suUrl: 'http://scclis:8080/SUplus-web', suClient: 'csfqc' },
 }
 
@@ -76,7 +78,7 @@ var suApps = {
 var pushUrlsTargets = {
     setup: path.resolve(pathes['clientBinPath'], 'runtime\\setup\\Environment.config'),
     security: path.resolve(pathes['clientBinPath'], 'runtime\\security\\Environment.config'),
-    lock: path.resolve(pathes['clientBinPath'], 'cslck\\Environment.config')
+    lock: path.resolve(pathes['clientBinPath'], 'runtime\\lockAdmin\\Environment.config')
 }
 
 function combineExecutionArgs(currentArgs, funktionMap, key, functionArgs) {
@@ -260,7 +262,7 @@ function printVersion(revision) {
         } else {
             console.log(stdout);
             var version = stdout.match(/\/tags\/csf\/1.0.1\/(\d+.\d+.\d+.\d+)/)[1];
-            var url = 'http://se/cm/index.php?script=install%2Findex.php^&ProductList=340^&search=' + version + '^&ShowSVN=on^&selectSVN=0^&Office%5B%5D=SCC';
+            var url = 'http://se/cm/products/search?officeOptions%5B%5D=SCC^&product=340^&versionMask=' + version
             executeAndForget(['start', url]);
         }
     });
@@ -304,6 +306,7 @@ function modifyFilesRecursive(folder, visitors) {
 
 function disableProxy() {
    modifyFilesRecursive(pathes['clientBinPath'], disableProxyFileVisitors);
+   modifyFilesRecursive(pathes['envsBinPath'], disableProxyFileVisitors);
 }
 
 var params = process.argv.slice(2);

@@ -7,7 +7,7 @@ namespace CodeReviewLauncher
 {
    class Program
    {
-      private const string codeReviewPath = @"D:\Projects\DevTools\svn-codereview";
+      private const string codeReviewPath = @"E:\Projects\DevTools\svn-codereview";
       private const string codeReview = "SVNGUICodeReview.hta";
 
       [STAThread]

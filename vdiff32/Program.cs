@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace vdiff32
 {
@@ -13,6 +9,10 @@ namespace vdiff32
 
       private static void Main(string[] args)
       {
+         if (args.Length >= 7 && args[0] == "-u")
+         {
+            args = new[] { args[5], args[6] };
+         }
          var psi = new ProcessStartInfo { FileName = merge, Arguments = String.Join(" ", args) };
          Process.Start(psi);
       }
